@@ -14,7 +14,7 @@
     "trading",
     "websocket"
   ],
-  "author": "",
+  "author": "GetBlock",
   "license": "ISC",
   "type": "module",
   "dependencies": {

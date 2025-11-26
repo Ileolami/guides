@@ -1,0 +1,23 @@
+{
+  "name": "pumpfun-raydium-listener",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Real-time listener for Pump.fun to Raydium migrations",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "pump.fun",
+    "raydium",
+    "solana",
+    "getblock"
+  ],
+  "author": "GetBlock",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "dotenv": "^17.2.3",
+    "ws": "^8.18.3"
+  }
+}

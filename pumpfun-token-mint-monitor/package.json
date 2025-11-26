@@ -1,19 +1,19 @@
 {
-  "name": "pool-monitor",
+  "name": "pumpfun-monitor",
   "version": "1.0.0",
-  "description": "Monitor on-chain swap events for  Solana liquidity pool",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node pool-monitor.js"
+    "start": "node pumpfun-monitor.js"
   },
-  "keywords": ["Liquidity pool", ],
-  "author": "GetBlock",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "type": "module",
   "dependencies": {
     "@triton-one/yellowstone-grpc": "^4.0.2",
-    "bs58": "^5.0.0",
+    "bs58": "^6.0.0",
     "dotenv": "^17.2.3"
   }
 }
