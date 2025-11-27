@@ -1,0 +1,23 @@
+{
+  "name": "sol-transfer-monitor",
+  "version": "1.0.0",
+  "description": "A Listener that tracks high-value SOL transactions",
+  "main": "sol-transfer-monitor.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node sol-transfer-monitor.js"
+  },
+  "keywords": [
+    "Solana",
+    "Liquidity Monitor",
+    "Onchain transfer"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@triton-one/yellowstone-grpc": "^4.0.2",
+    "bs58": "^5.0.0",
+    "dotenv": "^17.2.3"
+  }
+}
