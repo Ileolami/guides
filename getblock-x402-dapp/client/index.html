@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GetBlock x402 dApp</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", sans-serif;
+        background: rgb(0, 0, 0);
+        min-height: 100vh;
+        color: #fff;
+        padding: 2rem;
+      }
+      .container {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      h1 {
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .subtitle {
+        color: #888;
+        margin-bottom: 1.5rem;
+      }
+      .wallet-section {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      #connectBtn {
+        background: #7b2cbf;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      #connectBtn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
+      #walletInfo {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        padding: 1rem;
+        border-radius: 12px;
+        display: none;
+      }
+      #walletInfo.connected {
+        display: block;
+      }
+      .wallet-address {
+        font-family: monospace;
+        color: #00d4ff;
+      }
+      .endpoints {
+        margin-top: 2rem;
+      }
+      .endpoints h2 {
+        font-size: 1.2rem;
+        color: #888;
+        margin-bottom: 1rem;
+      }
+      .endpoint-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+      .endpoint-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(0, 212, 255, 0.3);
+      }
+      .endpoint-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      .endpoint-price {
+        color: #00d4ff;
+        font-size: 0.9rem;
+      }
+      .pay-btn {
+        background: #7b2cbf;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .pay-btn:hover {
+        opacity: 0.9;
+      }
+      .pay-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      #status {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        display: none;
+      }
+      #status.error {
+        display: block;
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+        color: #ff6b6b;
+      }
+      #status.loading {
+        display: block;
+        background: rgba(255, 255, 0, 0.1);
+        border: 1px solid rgba(255, 255, 0, 0.3);
+        color: #ffd93d;
+      }
+      #status.success {
+        display: block;
+        background: rgba(0, 255, 0, 0.1);
+        border: 1px solid rgba(0, 255, 0, 0.3);
+        color: #00ff88;
+      }
+      #result {
+        margin-top: 1.5rem;
+        display: none;
+      }
+      #result.show {
+        display: block;
+      }
+      #result h3 {
+        color: #00ff88;
+        margin-bottom: 0.75rem;
+      }
+      #result pre {
+        background: rgba(0, 0, 0, 0.4);
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 0.9rem;
+      }
+      footer {
+        text-align: center;
+        margin-top: 3rem;
+        color: #666;
+        font-size: 0.85rem;
+      }
+      .network-badge {
+        display: inline-block;
+        background: rgba(123, 44, 191, 0.2);
+        color: #b57edc;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+      }
+      .info-box {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        color: #aaa;
+      }
+      .info-box a {
+        color: #00d4ff;
+        text-decoration: none;
+      }
+      .info-box a:hover {
+        text-decoration: underline;
+      }
+      .debug-log {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.5rem;
+        margin-top: 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.75rem;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+      }
+      .debug-log.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>GetBlock x402 dApp</h1>
+        <p class="subtitle">Pay-per-request blockchain data powered by x402</p>
+      </header>
+
+      <div class="info-box">
+        <strong>Requirements:</strong> MetaMask wallet with USDC on Base Sepolia testnet.<br />
+        Get test USDC from <a href="https://faucet.circle.com/" target="_blank">Circle Faucet</a>
+      </div>
+
+      <div class="wallet-section">
+        <button id="connectBtn">Connect Wallet</button>
+        <div id="walletInfo">
+          <p>Connected: <span class="wallet-address" id="walletAddress"></span></p>
+          <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #888">
+            USDC Balance: <span id="usdcBalance">Loading...</span>
+          </p>
+          <span class="network-badge">Base Sepolia Testnet</span>
+        </div>
+      </div>
+
+      <div class="endpoints" id="endpoints" style="display: none">
+        <h2>Available Endpoints</h2>
+        <div class="endpoint-card">
+          <div>
+            <div class="endpoint-name">Latest Block Number</div>
+            <div class="endpoint-price">$0.001 USDC</div>
+          </div>
+          <button class="pay-btn" data-endpoint="/api/eth/block/latest">Pay & Fetch</button>
+        </div>
+        <div class="endpoint-card">
+          <div>
+            <div class="endpoint-name">Current Gas Price</div>
+            <div class="endpoint-price">$0.001 USDC</div>
+          </div>
+          <button class="pay-btn" data-endpoint="/api/eth/gas">Pay & Fetch</button>
+        </div>
+      </div>
+
+      <div id="status"></div>
+      <div id="result">
+        <h3>✓ Result</h3>
+        <pre id="resultData"></pre>
+      </div>
+
+      <footer>
+        <p>Network: Base Sepolia | Powered by GetBlock & x402</p>
+        <a href="#" id="toggleDebug" style="color: #666; font-size: 0.75rem">Toggle Debug Log</a>
+        <div class="debug-log" id="debugLog"></div>
+      </footer>
+    </div>
+
+    <!-- Load dependencies from CDN -->
+    <script type="module">
+      // =======================================================================
+      // Import Dependencies
+      // =======================================================================
+      import {
+        createWalletClient,
+        custom,
+        getAddress,
+      } from "https://esm.sh/viem@2.21.0";
+      import { baseSepolia } from "https://esm.sh/viem@2.21.0/chains";
+      import {
+        x402Client,
+        wrapFetchWithPayment,
+      } from "https://esm.sh/@x402/fetch";
+      import { registerExactEvmScheme } from "https://esm.sh/@x402/evm/exact/client";
+
+      // =======================================================================
+      // Configuration
+      // =======================================================================
+      const API_URL = "http://localhost:4021";
+      const BASE_SEPOLIA_CHAIN_ID = "0x14a34"; // 84532 in hex
+      const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // Base Sepolia USDC
+
+      // =======================================================================
+      // State
+      // =======================================================================
+      let fetchWithPayment = null;
+      let userAddress = null;
+
+      // =======================================================================
+      // DOM Elements
+      // =======================================================================
+      const connectBtn = document.getElementById("connectBtn");
+      const walletInfo = document.getElementById("walletInfo");
+      const walletAddressEl = document.getElementById("walletAddress");
+      const usdcBalanceEl = document.getElementById("usdcBalance");
+      const endpointsSection = document.getElementById("endpoints");
+      const statusEl = document.getElementById("status");
+      const resultEl = document.getElementById("result");
+      const resultData = document.getElementById("resultData");
+      const debugLog = document.getElementById("debugLog");
+      const toggleDebug = document.getElementById("toggleDebug");
+
+      // =======================================================================
+      // Debug Logging
+      // =======================================================================
+      function log(msg, type = "info") {
+        const time = new Date().toLocaleTimeString();
+        const color =
+          type === "error" ? "#ff6b6b" : type === "success" ? "#00ff88" : "#aaa";
+        debugLog.innerHTML += `<div style="color:${color}">[${time}] ${msg}</div>`;
+        debugLog.scrollTop = debugLog.scrollHeight;
+        console.log(`[${type}]`, msg);
+      }
+
+      toggleDebug.addEventListener("click", (e) => {
+        e.preventDefault();
+        debugLog.classList.toggle("show");
+      });
+
+      function showStatus(message, type) {
+        statusEl.textContent = message;
+        statusEl.className = type || "";
+      }
+
+      // =======================================================================
+      // USDC Balance Helper
+      // =======================================================================
+      async function getUsdcBalance(address) {
+        try {
+          // Call balanceOf(address) on USDC contract
+          const data = "0x70a08231" + address.slice(2).padStart(64, "0");
+          const result = await window.ethereum.request({
+            method: "eth_call",
+            params: [{ to: USDC_ADDRESS, data }, "latest"],
+          });
+          const balance = parseInt(result, 16) / 1e6; // USDC has 6 decimals
+          return balance.toFixed(6);
+        } catch (e) {
+          log("Error getting USDC balance: " + e.message, "error");
+          return "0.000000";
+        }
+      }
+
+      // =======================================================================
+      // Create x402-Compatible Signer
+      // =======================================================================
+      /**
+       * Creates a signer object that x402 can use to sign payment authorizations.
+       * This wraps MetaMask's signing capabilities in the interface x402 expects.
+       */
+      function createMetaMaskSigner(address, walletClient) {
+        return {
+          address: address,
+
+          async signTypedData(typedData) {
+            log("Signing payment authorization...");
+            log("Domain: " + JSON.stringify(typedData.domain));
+
+            try {
+              // Use viem's signTypedData which handles EIP-712 formatting
+              const signature = await walletClient.signTypedData({
+                account: address,
+                domain: typedData.domain,
+                types: typedData.types,
+                primaryType: typedData.primaryType,
+                message: typedData.message,
+              });
+
+              log("Signature obtained: " + signature.substring(0, 20) + "...", "success");
+              return signature;
+            } catch (error) {
+              log("Signing error: " + error.message, "error");
+              throw error;
+            }
+          },
+        };
+      }
+
+      // =======================================================================
+      // Connect Wallet Handler
+      // =======================================================================
+      connectBtn.addEventListener("click", async () => {
+        try {
+          if (!window.ethereum) {
+            showStatus("Please install MetaMask!", "error");
+            return;
+          }
+
+          showStatus("Connecting wallet...", "loading");
+          log("Requesting wallet connection...");
+
+          // Request account access
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          userAddress = getAddress(accounts[0]); // Normalize address checksum
+          log("Connected to: " + userAddress, "success");
+
+          // Switch to Base Sepolia network
+          log("Checking network...");
+          try {
+            await window.ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: BASE_SEPOLIA_CHAIN_ID }],
+            });
+            log("On Base Sepolia", "success");
+          } catch (switchError) {
+            // Network not added - add it
+            if (switchError.code === 4902) {
+              log("Adding Base Sepolia network...");
+              await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [
+                  {
+                    chainId: BASE_SEPOLIA_CHAIN_ID,
+                    chainName: "Base Sepolia",
+                    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+                    rpcUrls: ["https://sepolia.base.org"],
+                    blockExplorerUrls: ["https://sepolia.basescan.org"],
+                  },
+                ],
+              });
+            } else {
+              throw switchError;
+            }
+          }
+
+          // Create viem wallet client
+          log("Creating wallet client...");
+          const walletClient = createWalletClient({
+            account: userAddress,
+            chain: baseSepolia,
+            transport: custom(window.ethereum),
+          });
+
+          // Create x402-compatible signer
+          log("Creating x402 signer...");
+          const signer = createMetaMaskSigner(userAddress, walletClient);
+
+          // Initialize x402 client with EVM scheme
+          log("Initializing x402 client...");
+          const x402client = new x402Client();
+          registerExactEvmScheme(x402client, { signer });
+
+          // Wrap fetch with automatic payment handling
+          fetchWithPayment = wrapFetchWithPayment(fetch, x402client);
+          log("x402 client ready!", "success");
+
+          // Update UI
+          walletAddressEl.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+
+          const balance = await getUsdcBalance(userAddress);
+          usdcBalanceEl.textContent = balance + " USDC";
+          log("USDC Balance: " + balance);
+
+          walletInfo.classList.add("connected");
+          connectBtn.style.display = "none";
+          endpointsSection.style.display = "block";
+          showStatus("", "");
+        } catch (error) {
+          log("Connection error: " + error.message, "error");
+          showStatus("Connection failed: " + error.message, "error");
+        }
+      });
+
+      // =======================================================================
+      // Endpoint Button Click Handlers
+      // =======================================================================
+      document.querySelectorAll(".pay-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          if (!fetchWithPayment) {
+            showStatus("Please connect wallet first", "error");
+            return;
+          }
+
+          const endpoint = btn.dataset.endpoint;
+          const fullUrl = API_URL + endpoint;
+
+          // Disable buttons during request
+          document.querySelectorAll(".pay-btn").forEach((b) => (b.disabled = true));
+          btn.textContent = "Processing...";
+          showStatus("Making request...", "loading");
+          resultEl.classList.remove("show");
+
+          try {
+            log("Request: GET " + fullUrl);
+
+            // Make the paid request - x402 handles payment automatically
+            const response = await fetchWithPayment(fullUrl, { method: "GET" });
+
+            log("Response status: " + response.status);
+
+            if (response.status === 402) {
+              const text = await response.text();
+              log("402 response: " + text.substring(0, 200), "error");
+
+              try {
+                const data = JSON.parse(text);
+                if (data.accepts) {
+                  log("Payment requirements received", "error");
+                  throw new Error("Payment failed - check USDC balance and try again");
+                }
+                throw new Error(data.error || "Payment required");
+              } catch (e) {
+                if (e.message.includes("Payment") || e.message.includes("USDC")) throw e;
+                throw new Error("Payment required");
+              }
+            }
+
+            if (!response.ok) {
+              const text = await response.text();
+              log("Error: " + text, "error");
+              throw new Error(`Failed (${response.status}): ${text}`);
+            }
+
+            // Success! Display the data
+            const data = await response.json();
+            log("Success!", "success");
+            resultData.textContent = JSON.stringify(data, null, 2);
+            resultEl.classList.add("show");
+            showStatus("✓ Payment successful!", "success");
+
+            // Refresh USDC balance
+            const newBalance = await getUsdcBalance(userAddress);
+            usdcBalanceEl.textContent = newBalance + " USDC";
+          } catch (error) {
+            log("Error: " + error.message, "error");
+            showStatus("Error: " + error.message, "error");
+          } finally {
+            // Re-enable buttons
+            document.querySelectorAll(".pay-btn").forEach((b) => {
+              b.disabled = false;
+              b.textContent = "Pay & Fetch";
+            });
+          }
+        });
+      });
+
+      // =======================================================================
+      // Handle Wallet Events
+      // =======================================================================
+      if (window.ethereum) {
+        window.ethereum.on("accountsChanged", () => location.reload());
+        window.ethereum.on("chainChanged", () => location.reload());
+      }
+
+      // =======================================================================
+      // Initialize
+      // =======================================================================
+      log('Ready. Click "Connect Wallet" to start.');
+      log("Toggle this debug log with the link below.");
+    </script>
+  </body>
+</html>
